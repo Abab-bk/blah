@@ -1,20 +1,48 @@
 use std::fs;
+use std::path::PathBuf;
 
 use barb::compiler::CodeGen;
 use barb::interpreter::{Interpreter, parse_code};
+use clap::{CommandFactory, Parser, Subcommand};
 use inkwell::context::Context;
 
+#[derive(Parser, Debug)]
+#[command(version, about)]
+struct Cli {
+    #[arg(short, long, global = true)]
+    interpret: bool,
+
+    #[command(subcommand)]
+    command: Option<Commands>,
+
+    file: Option<PathBuf>,
+}
+
+#[derive(Subcommand, Debug)]
+enum Commands {
+    Run { file: PathBuf },
+}
+
 fn main() {
-    let args: Vec<String> = std::env::args().collect();
+    let cli = Cli::parse();
 
-    let use_interpret = args.iter().count() > 1 && args[1] == "-i";
-    let file_index = if use_interpret { 2 } else { 1 };
-    let filename = args.get(file_index).unwrap();
+    let file_path = match &cli.command {
+        Some(Commands::Run { file }) => file,
+        None => match &cli.file {
+            Some(file) => file,
+            None => Cli::command()
+                .error(
+                    clap::error::ErrorKind::MissingRequiredArgument,
+                    "requires a brainfuck file",
+                )
+                .exit(),
+        },
+    };
 
-    let contents = fs::read_to_string(filename).unwrap();
+    let contents = fs::read_to_string(file_path).unwrap();
     let operations = parse_code(&contents);
 
-    if use_interpret {
+    if cli.interpret {
         let mut interpreter = Interpreter {
             memory: [0; 30000],
             data_ptr: 0,

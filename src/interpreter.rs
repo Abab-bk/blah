@@ -65,7 +65,7 @@ pub fn parse_code(code: &str) -> Vec<Operation> {
                 operaions.push(Operation::JumpIfZero(0));
             }
             ']' => {
-                let start_idx = stack.pop().expect("括号不匹配：多余的 ]");
+                let start_idx = stack.pop().unwrap();
                 let end_idx = operaions.len();
 
                 if let Operation::JumpIfZero(ref mut target) = operaions[start_idx] {

@@ -1,8 +1,11 @@
+use std::path::Path;
+
 use inkwell::{
-    IntPredicate,
+    IntPredicate, OptimizationLevel,
     builder::Builder,
     context::Context,
     module::Module,
+    targets::{FileType, InitializationConfig, Target, TargetMachine, TargetMachineOptions},
     types::IntType,
     values::{FunctionValue, PointerValue},
 };
@@ -21,6 +24,62 @@ pub struct CodeGen<'ctx> {
 }
 
 impl<'ctx> CodeGen<'ctx> {
+    pub fn build(&self, output_dir: &Path, source_path: &Path) {
+        Target::initialize_native(&InitializationConfig {
+            base: true,
+            machine_code: true,
+            asm_printer: true,
+            asm_parser: true,
+            disassembler: true,
+            info: true,
+        })
+        .unwrap();
+
+        let triple = TargetMachine::get_default_triple();
+        let target = Target::from_triple(&triple).unwrap();
+
+        let cpu = TargetMachine::get_host_cpu_name().to_string();
+        let features = TargetMachine::get_host_cpu_features().to_string();
+        let options = TargetMachineOptions::default()
+            .set_cpu(&cpu)
+            .set_features(&features)
+            .set_abi("sysv")
+            .set_level(OptimizationLevel::Aggressive);
+
+        let machine = target
+            .create_target_machine_from_options(&triple, options)
+            .unwrap();
+
+        let obj_path = std::env::temp_dir().join(format!("barb_{}.o", std::process::id()));
+        machine
+            .write_to_file(&self.module, FileType::Object, &obj_path)
+            .unwrap();
+
+        let binary_name = source_path
+            .file_stem()
+            .unwrap_or_default()
+            .to_str()
+            .unwrap_or("a.out");
+        let output_path = output_dir.join(binary_name);
+
+        std::fs::create_dir_all(output_dir).unwrap();
+
+        let status = std::process::Command::new("cc")
+            .arg(&obj_path)
+            .arg("-o")
+            .arg(&output_path)
+            .status()
+            .expect("cc is required for linking");
+
+        let _ = std::fs::remove_file(&obj_path);
+
+        if !status.success() {
+            panic!("linker failed");
+        }
+
+        println!("Build success! path: {}", output_path.display())
+    }
+
     pub fn new(context: &'ctx Context) -> Self {
         let module = context.create_module("program");
         let builder = context.create_builder();

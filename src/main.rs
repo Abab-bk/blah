@@ -1,8 +1,9 @@
+use std::path::{Path, PathBuf};
 use std::fs;
-use std::path::PathBuf;
 
 use barb::compiler::CodeGen;
 use barb::interpreter::{Interpreter, parse_code};
+use barb::shared::Operation;
 use clap::{CommandFactory, Parser, Subcommand};
 use inkwell::context::Context;
 
@@ -20,29 +21,54 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
-    Run { file: PathBuf },
+    Run {
+        file: PathBuf,
+    },
+    Build {
+        file: PathBuf,
+
+        #[arg(short, long, default_value = "build/")]
+        output_dir: PathBuf,
+    },
 }
 
 fn main() {
     let cli = Cli::parse();
 
-    let file_path = match &cli.command {
-        Some(Commands::Run { file }) => file,
-        None => match &cli.file {
-            Some(file) => file,
-            None => Cli::command()
-                .error(
-                    clap::error::ErrorKind::MissingRequiredArgument,
-                    "requires a brainfuck file",
-                )
-                .exit(),
-        },
-    };
+    match &cli.command {
+        Some(Commands::Run { file }) => {
+            let operations = parse(&file);
+            run(operations, cli.interpret);
+        }
+        Some(Commands::Build { file, output_dir }) => {
+            let operations = parse(&file);
+            let context = Context::create();
+            let codegen = CodeGen::new(&context);
+            codegen.compile(&operations);
+            codegen.build(output_dir, file);
+        }
+        None => {
+            let file = cli.file.as_ref().unwrap_or_else(|| {
+                Cli::command()
+                    .error(
+                        clap::error::ErrorKind::MissingRequiredArgument,
+                        "requires a brainfuck file",
+                    )
+                    .exit();
+            });
+            let operations = parse(file);
+            run(operations, cli.interpret);
+        }
+    }
+}
 
-    let contents = fs::read_to_string(file_path).unwrap();
-    let operations = parse_code(&contents);
+fn parse(path: &Path) -> Vec<Operation> {
+    let contents = fs::read_to_string(path).unwrap();
+    parse_code(&contents)
+}
 
-    if cli.interpret {
+fn run(operations: Vec<Operation>, interpret: bool) {
+    if interpret {
         let mut interpreter = Interpreter {
             memory: [0; 30000],
             data_ptr: 0,

@@ -1,0 +1,4 @@
+name = "barb-test"
+
+[dependencies]
+hello-world = { path = "packages/hello-world" }

@@ -6,3 +6,7 @@ edition = "2024"
 [dependencies]
 clap = { version = "4.6.1", features = ["derive"] }
 inkwell = { version = "0.9.0", features = ["llvm22-1", "target-all"] }
+regex = "1"
+semver = "1"
+serde = { version = "1.0.228", features = ["derive"] }
+toml = "0.8"

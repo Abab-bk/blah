@@ -1,0 +1,4 @@
+name = "hello-world"
+
+[features]
+hello = "main.bf"

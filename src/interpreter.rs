@@ -17,8 +17,12 @@ impl Interpreter {
             match operation {
                 Operation::Next => self.data_ptr += 1,
                 Operation::Prev => self.data_ptr -= 1,
-                Operation::Increment => self.memory[self.data_ptr] += 1,
-                Operation::Decrement => self.memory[self.data_ptr] -= 1,
+                Operation::Increment => {
+                    self.memory[self.data_ptr] = self.memory[self.data_ptr].wrapping_add(1);
+                }
+                Operation::Decrement => {
+                    self.memory[self.data_ptr] = self.memory[self.data_ptr].wrapping_sub(1);
+                }
                 Operation::Output => print!("{}", self.memory[self.data_ptr] as char),
                 Operation::Input => {
                     let mut buffer = [0u8; 1];

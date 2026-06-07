@@ -1,0 +1,62 @@
+# Barb: Unified Toolchain for Brainfuck
+
+For a long time, Brainfuck has lacked modern tooling — not anymore. Barb is:
+
+- A Brainfuck runtime
+- A Brainfuck compiler (LLVM backend)
+- A Brainfuck package manager
+
+## Quick Start
+
+```sh
+cargo install barb
+```
+
+Create a new project:
+
+```sh
+barb new hello
+cd hello
+barb run main.bf
+```
+
+Run a brainfuck file:
+
+```sh
+barb path/to/program.bf
+```
+
+## Commands
+
+| Command             | Description           |
+| ------------------- | --------------------- |
+| `barb new <name>`   | Create a new project. |
+| `barb run <file>`   | Run a brainfuck file. |
+| `barb <file>`       | Same as above.        |
+| `barb build <file>` | Build native binary.  |
+| `barb install`      | Install dependencies. |
+
+## bark.toml
+
+```toml
+name = "hello"
+
+[features]
+# use it via @pkg-name/feature-name in source code
+stdout = "stdout.bf"
+
+[dependencies]
+stdlib = { git = "https://github.com/example/bf-stdlib" }
+utils = { path = "../utils" }
+```
+
+Dependencies support two sources:
+
+- git: downloaded via git clone
+- path: local path reference
+
+## Package Manager
+
+Barb is a package manager.
+
+In Brainfuck source code, use `@package-name/feature-name` to reference code snippets from installed packages. The behavior is like `include` in C.

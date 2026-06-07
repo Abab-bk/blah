@@ -2,10 +2,10 @@ use std::collections::HashMap;
 use std::fs::{self, write};
 use std::path::{Path, PathBuf};
 
-use barb::compiler::CodeGen;
-use barb::interpreter::Interpreter;
-use barb::package::{self, Manifest};
-use barb::shared::Operation;
+use blah::compiler::CodeGen;
+use blah::interpreter::Interpreter;
+use blah::package::{self, Manifest};
+use blah::shared::Operation;
 use clap::{CommandFactory, Parser, Subcommand};
 use inkwell::context::Context;
 

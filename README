@@ -1,6 +1,6 @@
-# Barb: Unified Toolchain for Brainfuck
+# Blah (**B**lah **L**ooks **A**wful, **H**uh?): Unified Toolchain for Brainfuck
 
-For a long time, Brainfuck has lacked modern tooling — not anymore. Barb is:
+For a long time, Brainfuck has lacked modern tooling — not anymore. blah is:
 
 - A Brainfuck runtime
 - A Brainfuck compiler (LLVM backend)
@@ -9,32 +9,32 @@ For a long time, Brainfuck has lacked modern tooling — not anymore. Barb is:
 ## Quick Start
 
 ```sh
-cargo install barb
+cargo install blah
 ```
 
 Create a new project:
 
 ```sh
-barb new hello
+blah new hello
 cd hello
-barb run main.bf
+blah run main.bf
 ```
 
 Run a brainfuck file:
 
 ```sh
-barb path/to/program.bf
+blah path/to/program.bf
 ```
 
 ## Commands
 
 | Command             | Description           |
 | ------------------- | --------------------- |
-| `barb new <name>`   | Create a new project. |
-| `barb run <file>`   | Run a brainfuck file. |
-| `barb <file>`       | Same as above.        |
-| `barb build <file>` | Build native binary.  |
-| `barb install`      | Install dependencies. |
+| `blah new <name>`   | Create a new project. |
+| `blah run <file>`   | Run a brainfuck file. |
+| `blah <file>`       | Same as above.        |
+| `blah build <file>` | Build native binary.  |
+| `blah install`      | Install dependencies. |
 
 ## bark.toml
 
@@ -57,6 +57,6 @@ Dependencies support two sources:
 
 ## Package Manager
 
-Barb is a package manager.
+Blah is a package manager.
 
 In Brainfuck source code, use `@package-name/feature-name` to reference code snippets from installed packages. The behavior is like `include` in C.

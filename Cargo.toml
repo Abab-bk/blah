@@ -1,6 +1,6 @@
 [package]
 name = "blah"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 authors = ["abab-bk"]
 description = "Unified Toolchain for Brainfuck."
@@ -13,6 +13,7 @@ include = [
     "README.md",
     "LICENSE",
 ]
+readme = "README.md"
 
 [dependencies]
 clap = { version = "4.6.1", features = ["derive"] }

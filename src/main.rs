@@ -10,7 +10,7 @@ use clap::{CommandFactory, Parser, Subcommand};
 use inkwell::context::Context;
 
 #[derive(Parser, Debug)]
-#[command(version, about)]
+#[command(version, about = "Barb: Unified Toolchain for Brainfuck.")]
 struct Cli {
     #[arg(short, long, global = true)]
     interpret: bool,
@@ -23,18 +23,21 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
-    Run {
-        file: PathBuf,
-    },
+    #[command(about = "Run a brainfuck file.")]
+    Run { file: PathBuf },
+
+    #[command(about = "Build native binary.")]
     Build {
         file: PathBuf,
 
         #[arg(short, long, default_value = "build/")]
         output_dir: PathBuf,
     },
-    New {
-        name: String,
-    },
+
+    #[command(about = "Create a new project.")]
+    New { name: String },
+
+    #[command(about = "Install packages from bark.toml.")]
     Install,
 }
 
